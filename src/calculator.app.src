@@ -1,0 +1,17 @@
+{application, calculator,
+  [{description,  "my calculator application"},
+   {id,           "identifier one bla bla"},
+   {vsn,          "0.0.1"},
+   {modules,      [
+                   calculator,
+                   calculator_app,
+                   calculator_sup
+                  ]},
+   {registered,   [calculator_name]},
+   {included_applications, []},
+   {applications, []},
+   {env,          []},
+   {mod,          {calculator_app, []}}
+  ]}.
+
+
