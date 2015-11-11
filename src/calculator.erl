@@ -22,7 +22,8 @@
          set_fun_math/1,
          set_operand_one/1,
          set_operand_two/1,
-         set_operands/2
+         set_operands/2,
+         perform_operation/0
         ]).
 
 %% gen_server callbacks
@@ -38,9 +39,7 @@
           internal_var :: any(),
           fun_math :: fun (),
           operand_one :: integer (),
-          operand_two :: integer (), 
-          one_of_operands :: integer (),
-          two_of_operands :: integer ()
+          operand_two :: integer ()
         }).
 
 %%%===================================================================
@@ -67,6 +66,10 @@ start_link() ->
 get_state() ->
     io:format("get_state/0, pid: ~p~n", [self()]),
     gen_server:call(?SERVER, get_me_state).
+
+perform_operation() ->
+    io:format("perform_operation/0, pid: ~p~n", [self()]),
+    gen_server:call(?SERVER, get_me_result).
 
 %%--------------------------------------------------------------------
 %% @doc just a demo of a API call
@@ -96,7 +99,10 @@ set_operand_two (B) ->
 -spec set_operands(Ds1 :: integer(), Ds2 :: integer()) -> ok.
 set_operands (Ds1, Ds2) ->
     io:format("set_operands/2, pid: ~p, ~p, ~p~n", [self(), Ds1, Ds2]),
-    gen_server:call(?SERVER, {one_of_operands, Ds1, two_of_operands, Ds2}).
+    gen_server:call(?SERVER, {operands, Ds1, Ds2}).
+
+
+
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
@@ -152,9 +158,16 @@ handle_call({fun_yanki, Function}, _From, State) ->
     io:format("handle_call/3 (fun_math), pid: ~p~n", [self()]),
     {reply, ok_fun, State#state{fun_math = Function}};
 
-handle_call({one_of_operands, Op1, two_of_operands, Op2}, _From, State) ->
+handle_call({operands, Op1, Op2}, _From, State) ->
     io:format("handle_call/3 (operands), pid: ~p~n", [self()]),
-    {reply, okey, State#state{one_of_operands = Op1, two_of_operands = Op2}};
+    {reply, okey, State#state{operand_one = Op1, operand_two = Op2}};
+
+handle_call(get_me_result, _From, State) ->
+    io:format("handle_call/3 (get_me_result), pid: ~p~n", [self()]),
+    F = State#state.fun_math,
+    A = State#state.operand_one,
+    B = State#state.operand_two,
+    {reply,  F ( A, B ),  State};
 
 handle_call(_Request, _From, State) ->
     io:format("handle_call/3 (default) , pid: ~p~n", [self()]),
