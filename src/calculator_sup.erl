@@ -11,7 +11,7 @@
 -behaviour(supervisor).
 
 %% API
--export([certificate_blin/0]).
+-export([start_my_link/0]).
 
 %% Supervisor callbacks
 -export([init/1]).
@@ -26,11 +26,11 @@
 %% @doc
 %% Starts the supervisor
 %%
-%% @spec certificate_blin() -> {ok, Pid} | ignore | {error, Error}
+%% @spec start_my_link() -> {ok, Pid} | ignore | {error, Error}
 %% @end
 %%--------------------------------------------------------------------
-certificate_blin() ->
-    io:format("calculator_sup certificate_blin/0, pid ~p~n", [self()]),
+start_my_link() ->
+    io:format("calculator_sup start_my_link/0, pid ~p~n", [self()]),
     supervisor:start_link({local, ?SERVER}, ?MODULE, []).
 
 %%%===================================================================

@@ -128,17 +128,17 @@ handle_call(get_me_state, _From, State) ->
     CurrNum = State#state.req_processed,
     {reply, {takeit, State}, State#state{req_processed = CurrNum +1}};
 
-handle_call({naive_yanki, Dura}, _From, State) ->
-    io:format("handle_call/3 (ep tvayu), pid: ~p~n", [self()]),
-    {reply, ok_blia, State#state{internal_var = Dura}};
+handle_call({naive_yanki, IntVar}, _From, State) ->
+    io:format("handle_call/3 (set IntVar), pid: ~p~n", [self()]),
+    {reply, ok_blia, State#state{internal_var = IntVar}};
 
-handle_call({opA, DuraA}, _From, State) ->
-    io:format("handle_call/3 (ep A), pid: ~p~n", [self()]),
-    {reply, ok_A, State#state{operand_one = DuraA}};
+handle_call({opA, SetA}, _From, State) ->
+    io:format("handle_call/3 (set A), pid: ~p~n", [self()]),
+    {reply, ok_A, State#state{operand_one = SetA}};
 
-handle_call({opB, DuraB}, _From, State) ->
-    io:format("handle_call/3 (ep A), pid: ~p~n", [self()]),
-    {reply, ok_B, State#state{operand_two = DuraB}};
+handle_call({opB, SetB}, _From, State) ->
+    io:format("handle_call/3 (set B), pid: ~p~n", [self()]),
+    {reply, ok_B, State#state{operand_two = SetB}};
 
 handle_call(_Request, _From, State) ->
     io:format("handle_call/3 (default) , pid: ~p~n", [self()]),
