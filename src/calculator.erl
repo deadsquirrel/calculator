@@ -21,7 +21,8 @@
          set_internal_var/1,
          set_fun_math/1,
          set_operand_one/1,
-         set_operand_two/1
+         set_operand_two/1,
+         set_operands/2
         ]).
 
 %% gen_server callbacks
@@ -37,7 +38,9 @@
           internal_var :: any(),
           fun_math :: fun (),
           operand_one :: integer (),
-          operand_two :: integer ()
+          operand_two :: integer (), 
+          one_of_operands :: integer (),
+          two_of_operands :: integer ()
         }).
 
 %%%===================================================================
@@ -73,7 +76,7 @@ get_state() ->
 -spec set_internal_var(NewVal :: any()) -> ok.
 set_internal_var(NewVal) ->
     io:format("set_internal_var/1, pid: ~p~n", [self()]),
-    gen_server:call(?SERVER, {naive_yanki, NewVal}).
+    gen_server:call(?SERVER, {set_int_var, NewVal}).
 
 -spec set_fun_math(Function :: fun()) -> ok.
 set_fun_math(Function) ->
@@ -89,6 +92,11 @@ set_operand_one(A) ->
 set_operand_two (B) ->
     io:format("set_operand_two/1, pid: ~p, ~p~n", [self(), B]),
     gen_server:call(?SERVER, {opB, B}).
+
+-spec set_operands(Ds1 :: integer(), Ds2 :: integer()) -> ok.
+set_operands (Ds1, Ds2) ->
+    io:format("set_operands/2, pid: ~p, ~p, ~p~n", [self(), Ds1, Ds2]),
+    gen_server:call(?SERVER, {one_of_operands, Ds1, two_of_operands, Ds2}).
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
@@ -128,7 +136,7 @@ handle_call(get_me_state, _From, State) ->
     CurrNum = State#state.req_processed,
     {reply, {takeit, State}, State#state{req_processed = CurrNum +1}};
 
-handle_call({naive_yanki, IntVar}, _From, State) ->
+handle_call({set_int_var, IntVar}, _From, State) ->
     io:format("handle_call/3 (set IntVar), pid: ~p~n", [self()]),
     {reply, ok_blia, State#state{internal_var = IntVar}};
 
@@ -139,6 +147,14 @@ handle_call({opA, SetA}, _From, State) ->
 handle_call({opB, SetB}, _From, State) ->
     io:format("handle_call/3 (set B), pid: ~p~n", [self()]),
     {reply, ok_B, State#state{operand_two = SetB}};
+
+handle_call({fun_yanki, Function}, _From, State) ->
+    io:format("handle_call/3 (fun_math), pid: ~p~n", [self()]),
+    {reply, ok_fun, State#state{fun_math = Function}};
+
+handle_call({one_of_operands, Op1, two_of_operands, Op2}, _From, State) ->
+    io:format("handle_call/3 (operands), pid: ~p~n", [self()]),
+    {reply, okey, State#state{one_of_operands = Op1, two_of_operands = Op2}};
 
 handle_call(_Request, _From, State) ->
     io:format("handle_call/3 (default) , pid: ~p~n", [self()]),
