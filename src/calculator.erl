@@ -17,7 +17,11 @@
 %% API
 -export([
          start_link/0,
-         get_state/0
+         get_state/0,
+         set_internal_var/1,
+         set_fun_math/1,
+         set_operand_one/1,
+         set_operand_two/1
         ]).
 
 %% gen_server callbacks
@@ -29,7 +33,11 @@
 -record(state,
         {
           time_started :: calendar:datetime(),
-          req_processed = 0 :: integer()
+          req_processed = 0 :: integer(),
+          internal_var :: any(),
+          fun_math :: fun (),
+          operand_one :: integer (),
+          operand_two :: integer ()
         }).
 
 %%%===================================================================
@@ -54,8 +62,33 @@ start_link() ->
 %%--------------------------------------------------------------------
 -spec get_state() -> #state{}.
 get_state() ->
+    io:format("get_state/0, pid: ~p~n", [self()]),
     gen_server:call(?SERVER, get_me_state).
 
+%%--------------------------------------------------------------------
+%% @doc just a demo of a API call
+%%  устанавливаем значения элементов в state
+%% @end
+%%--------------------------------------------------------------------
+-spec set_internal_var(NewVal :: any()) -> ok.
+set_internal_var(NewVal) ->
+    io:format("set_internal_var/1, pid: ~p~n", [self()]),
+    gen_server:call(?SERVER, {naive_yanki, NewVal}).
+
+-spec set_fun_math(Function :: fun()) -> ok.
+set_fun_math(Function) ->
+    io:format("set_fun_math/1, pid: ~p~n", [self()]),
+    gen_server:call(?SERVER, {fun_yanki, Function}).
+
+-spec set_operand_one(A :: integer()) -> ok.
+set_operand_one(A) ->
+    io:format("set_operand_one/1, pid: ~p, ~p~n", [self(), A]),
+    gen_server:call(?SERVER, {opA, A}).
+
+-spec set_operand_two(B :: integer()) -> ok.
+set_operand_two (B) ->
+    io:format("set_operand_two/1, pid: ~p, ~p~n", [self(), B]),
+    gen_server:call(?SERVER, {opB, B}).
 %%%===================================================================
 %%% gen_server callbacks
 %%%===================================================================
@@ -91,9 +124,24 @@ init([]) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_call(get_me_state, _From, State) ->
+    io:format("handle_call/3 (get_me_state), pid: ~p~n", [self()]),
     CurrNum = State#state.req_processed,
     {reply, {takeit, State}, State#state{req_processed = CurrNum +1}};
+
+handle_call({naive_yanki, Dura}, _From, State) ->
+    io:format("handle_call/3 (ep tvayu), pid: ~p~n", [self()]),
+    {reply, ok_blia, State#state{internal_var = Dura}};
+
+handle_call({opA, DuraA}, _From, State) ->
+    io:format("handle_call/3 (ep A), pid: ~p~n", [self()]),
+    {reply, ok_A, State#state{operand_one = DuraA}};
+
+handle_call({opB, DuraB}, _From, State) ->
+    io:format("handle_call/3 (ep A), pid: ~p~n", [self()]),
+    {reply, ok_B, State#state{operand_two = DuraB}};
+
 handle_call(_Request, _From, State) ->
+    io:format("handle_call/3 (default) , pid: ~p~n", [self()]),
     Reply = ok,
     {reply, Reply, State}.
 
@@ -108,6 +156,7 @@ handle_call(_Request, _From, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_cast(_Msg, State) ->
+    io:format("handle_cast/2 (default) , pid: ~p~n", [self()]),
     {noreply, State}.
 
 %%--------------------------------------------------------------------
@@ -121,6 +170,7 @@ handle_cast(_Msg, State) ->
 %% @end
 %%--------------------------------------------------------------------
 handle_info(_Info, State) ->
+    io:format("handle_info/2 (default) , pid: ~p~n", [self()]),
     {noreply, State}.
 
 %%--------------------------------------------------------------------
@@ -135,6 +185,7 @@ handle_info(_Info, State) ->
 %% @end
 %%--------------------------------------------------------------------
 terminate(_Reason, _State) ->
+    io:format("terminate/2, pid: ~p~n", [self()]),
     ok.
 
 %%--------------------------------------------------------------------
@@ -146,6 +197,7 @@ terminate(_Reason, _State) ->
 %% @end
 %%--------------------------------------------------------------------
 code_change(_OldVsn, State, _Extra) ->
+    io:format("code_change/3, pid: ~p~n", [self()]),
     {ok, State}.
 
 %%%===================================================================

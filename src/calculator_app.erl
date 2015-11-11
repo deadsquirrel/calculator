@@ -35,7 +35,7 @@
 %%--------------------------------------------------------------------
 start(_StartType, _StartArgs) ->
     io:format("calculator_app start/2, pid ~p~n", [self()]),
-    case calculator_sup:start_link() of
+    case calculator_sup:certificate_blin() of
         {ok, Pid} ->
             {ok, Pid};
         Error ->
